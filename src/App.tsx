@@ -19,9 +19,21 @@ function App() {
     }
   })
 
-  const handleForm = useCallback(({ cpf, password }: formValues) => {
+  const handleForm = useCallback(async ({ cpf, password }: formValues) => {
     console.log(cpf, password)
-  }, [])
+    const loginData = JSON.stringify({
+      cpf,
+      password
+    })
+    console.log(loginData)
+    const response = await fetch("http://localhost:3000/contas/auth", {
+      method: "POST",
+      body: loginData
+    })
+    console.log(response)
+  }, []);
+
+
   return (
     <>
       <form onSubmit={form.onSubmit(handleForm)}>
