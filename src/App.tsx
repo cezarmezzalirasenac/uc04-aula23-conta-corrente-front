@@ -1,9 +1,7 @@
-
-
 import { useForm } from '@mantine/form'
 import './App.css'
 import { Button, PasswordInput, TextInput } from '@mantine/core'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 
 type formValues = {
   cpf: string;
@@ -19,6 +17,8 @@ function App() {
     }
   })
 
+  const [status, setStatus] = useState('Não Logado');
+
   const handleForm = useCallback(async ({ cpf, password }: formValues) => {
     console.log(cpf, password)
     const loginData = JSON.stringify({
@@ -26,11 +26,26 @@ function App() {
       password
     })
     console.log(loginData)
-    const response = await fetch("http://localhost:3000/contas/auth", {
-      method: "POST",
-      body: loginData
-    })
-    console.log(response)
+
+    const options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: `{"cpf":"${cpf}","password":"${password}"}`
+    };
+    try {
+      const response = await fetch("http://172.17.9.86:3000/contas/auth", options)
+      const responseBody = await response.json();
+      const { token } = responseBody
+      if (token) {
+        console.log(token)
+        setStatus("Logado")
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+
+
   }, []);
 
 
@@ -54,6 +69,7 @@ function App() {
           Submit
         </Button>
       </form>
+      <h1>{status}</h1>
     </>
   )
 }
